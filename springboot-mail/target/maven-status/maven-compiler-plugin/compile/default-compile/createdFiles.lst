@@ -1,0 +1,3 @@
+com\pancm\MailApp.class
+com\pancm\pojo\Mail.class
+com\pancm\web\MailController.class
