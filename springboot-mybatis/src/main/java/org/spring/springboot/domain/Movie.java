@@ -48,6 +48,6 @@ public class Movie {
 
     private Date updateTime;
 
-    private Date remarks;
+    private String remarks;
     
 }

@@ -27,12 +27,18 @@
 
     <sql id="basicColumn">
         movie_id
-        , movie_name, movie_description, movie_cover, movie_type, movie_rates,
+        ,movie_name, movie_description, movie_cover, movie_type, movie_rates,
         movie_score, movie_status, movie_time, movie_duration, movie_views,
         movie_comments, movie_likes, movie_dislikes, movie_downloads,
         movie_download_url, movie_download_count, movie_release_time,
         create_time, update_time, remarks
     </sql>
+
+    <!-- 定义查询所有电影的查询，引用上面定义的列 -->
+    <select id="selectAllMovie" resultMap="movieResult">
+        select movie_id
+        from movies
+    </select>
 
     <insert id="insertMovie" parameterType="Movie" useGeneratedKeys="true" keyProperty="movieId">
         insert into movies(
@@ -43,20 +49,6 @@
 
     </insert>
 
-
-    <select id="selectAllMovie" resultMap="movieResult">
-        select m.movie_id,
-               m.movie_name,
-               m.movie_description,
-               m.movie_cover,
-               m.movie_type,
-               m.movie_rates,
-               d.director_id,
-               d.director_name
-        from movies m
-                 left join director d on m.movie_director_id = d.director_id
-        order by movie_score desc
-    </select>
 
     <select id="selectMovieList" parameterType="Movie" resultMap="movieResult">
         select

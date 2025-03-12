@@ -2,6 +2,8 @@ package org.spring.springboot.service.impl;
 
 
 
+import org.spring.springboot.dao.MovieMapper;
+import org.spring.springboot.domain.Movie;
 import org.spring.springboot.service.IMovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
