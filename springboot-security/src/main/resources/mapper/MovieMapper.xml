@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.spring.springboot.dao.MovieMapper">
-    <resultMap id="movieResult" type="org.spring.springboot.domain.Movie">
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springMovie.mapper.MovieMapper">
+    <resultMap id="movieResult" type="com.springMovie.domain.Movie">
         <id column="movie_id" property="movieId"/>
         <result column="movie_name" property="movieName"/>
         <result column="movie_description" property="movieDescription"/>
@@ -25,83 +27,7 @@
         <result column="remarks" property="remarks"/>
     </resultMap>
 
-    <sql id="basicColumn">
-        movie_id
-        ,movie_name, movie_description, movie_cover, movie_type, movie_rates,
-        movie_score, movie_status, movie_time, movie_duration, movie_views,
-        movie_comments, movie_likes, movie_dislikes, movie_downloads,
-        movie_download_url, movie_download_count, movie_release_time,
-        create_time, update_time, remarks
-    </sql>
+        <select id="selectAllMovie" resultMap="movieResult">
 
-    <!-- 定义查询所有电影的查询，引用上面定义的列 -->
-    <select id="selectAllMovie" resultMap="movieResult">
-        select movie_id
-        from movies
-    </select>
-
-    <insert id="insertMovie" parameterType="Movie" useGeneratedKeys="true" keyProperty="movieId">
-        insert into movies(
-        <if test="movieName != null and movieName != ''">movie_name</if>
-        )values(
-        <if test="movieName != null and movieName != ''">#{movieName}</if>
-        )
-
-    </insert>
-
-
-    <select id="selectMovieList" parameterType="Movie" resultMap="movieResult">
-        select
-        <include refid="basicColumn"/>
-        from movies
-        <where>
-            <if test="movieName != null and movieName != ''">
-                and movie_name like concat('%', #{movieName}, '%')
-            </if>
-            <if test="movieScore != null and movieScore != ''">
-                and movie_score &gt;= #{movieScore}
-            </if>
-            <if test="movieType != null and movieType != ''">
-                and movieType = #{movieType}
-            </if>
-        </where>
-    </select>
-
-    <select id="selectByName" resultMap="movieResult">
-        select
-        <include refid="basicColumn"/>
-        from movies
-        <where>
-            <if test="movieName != null and movieName != ''">
-                and movie_name like concat('%', #{movieName}, '%')
-            </if>
-        </where>
-    </select>
-
-    <select id="selectByScore" resultMap="movieResult">
-        select
-        <include refid="basicColumn"/>
-        from movies
-        <where>
-            <if test="movieScore != null and movieScore != ''">
-                and movie_score &gt;= #{movieScore}
-            </if>
-        </where>
-    </select>
-
-    <update id="updateMovie" parameterType="Movie">
-        update movies
-        <set>
-            <if test="movieName != null and movieName != ''">movie_name = #{movieName},</if>
-        </set>
-        where movie_id = #{movieId}
-    </update>
-
-    <delete id="deleteMovieByIds" parameterType="Long">
-        delete from movies
-        where movie_id in
-        <foreach collection="delIds" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
+        </select>
 </mapper>
