@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springMovie.mapper.MovieMapper">
+    <resultMap id="movieResult" type="com.springMovie.domain.Movie">
+        <id column="movie_id" property="movieId"/>
+        <result column="movie_name" property="movieName"/>
+        <result column="movie_description" property="movieDescription"/>
+        <result column="movie_cover" property="movieCover"/>
+        <result column="movie_type" property="movieType"/>
+        <result column="movie_rates" property="movieRates"/>
+        <result column="movie_score" property="movieScore"/>
+        <result column="movie_status" property="movieStatus"/>
+        <result column="movie_time" property="movieTime"/>
+        <result column="movie_duration" property="movieDuration"/>
+        <result column="movie_views" property="movieViews"/>
+        <result column="movie_comments" property="movieComments"/>
+        <result column="movie_likes" property="movieLikes"/>
+        <result column="movie_dislikes" property="movieDislikes"/>
+        <result column="movie_downloads" property="movieDownloads"/>
+        <result column="movie_download_url" property="movieDownloadUrl"/>
+        <result column="movie_download_count" property="movieDownloadCount"/>
+        <result column="movie_release_time" property="movieReleaseTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remarks" property="remarks"/>
+    </resultMap>
+
+        <select id="selectAllMovie" resultMap="movieResult">
+
+        </select>
+</mapper>
