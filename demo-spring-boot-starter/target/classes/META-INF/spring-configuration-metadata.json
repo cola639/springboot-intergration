@@ -1,0 +1,37 @@
+{
+  "groups": [
+    {
+      "name": "demo",
+      "type": "com.demo.starter.properties.DemoProperties",
+      "sourceType": "com.demo.starter.properties.DemoProperties"
+    },
+    {
+      "name": "demo1",
+      "type": "com.demo.starter.properties.Demo1Properties",
+      "sourceType": "com.demo.starter.properties.Demo1Properties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "demo.say-what",
+      "type": "java.lang.String",
+      "sourceType": "com.demo.starter.properties.DemoProperties"
+    },
+    {
+      "name": "demo.to-who",
+      "type": "java.lang.String",
+      "sourceType": "com.demo.starter.properties.DemoProperties"
+    },
+    {
+      "name": "demo1.say-what",
+      "type": "java.lang.String",
+      "sourceType": "com.demo.starter.properties.Demo1Properties"
+    },
+    {
+      "name": "demo1.to-who",
+      "type": "java.lang.String",
+      "sourceType": "com.demo.starter.properties.Demo1Properties"
+    }
+  ],
+  "hints": []
+}
