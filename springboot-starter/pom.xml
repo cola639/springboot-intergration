@@ -29,6 +29,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.demo</groupId>
+            <artifactId>demo-spring-boot-starter</artifactId>
+            <version>0.0.1-RELEASE</version>
+        </dependency>
+
         <!-- Spring Boot Test 依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -13,3 +13,13 @@ mybatis:
   type-aliases-package: org.spring.springboot.domain
   # xml file
   mapper-locations: classpath:mapper/*.xml
+
+
+demo:
+  isopen: true  # 这个必须为 true，否则不会加载 Bean
+  sayWhat: "Hello"
+  toWho: "Spring Boot Starter"
+
+demo1:
+  sayWhat: "Hi"
+  toWho: "Conditional Configuration"
