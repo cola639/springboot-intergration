@@ -1,0 +1,6 @@
+org\spring\springboot\Application.class
+org\spring\springboot\controller\MovieContoller.class
+org\spring\springboot\domain\Movie.class
+org\spring\springboot\dao\MovieMapper.class
+org\spring\springboot\service\IMovieService.class
+org\spring\springboot\service\impl\MovieServiceImpl.class
