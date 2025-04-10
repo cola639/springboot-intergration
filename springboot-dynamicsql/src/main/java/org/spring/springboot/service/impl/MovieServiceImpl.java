@@ -1,6 +1,7 @@
 package org.spring.springboot.service.impl;
 
 
+import org.spring.springboot.Repository.MovieRepository;
 import org.spring.springboot.domain.Movie;
 import org.spring.springboot.enums.DataSourceType;
 import org.spring.springboot.service.IMovieService;
@@ -11,17 +12,18 @@ import java.util.List;
 
 @Service
 public class MovieServiceImpl implements IMovieService {
+    @Autowired
+    private MovieRepository movieRepository;
 
 
     @Override
     public List<Movie> selectAllMovieFromSlave() {
-
+        return movieRepository.findAll();
     }
 
     @Override
     public List<Movie> selectAllMovieFromMaster() {
-
-
+        return movieRepository.findAll();
     }
 
 }

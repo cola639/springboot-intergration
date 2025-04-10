@@ -17,11 +17,12 @@ public class MovieContoller {
 
     @GetMapping("/allMoviesFromSlave")
     public List<Movie> getAllMovie() {
-
+        return movieService.selectAllMovieFromSlave();
     }
 
     @GetMapping("/allMoviesFromMater")
     public List<Movie> MoviesFromMater() {
+        return movieService.selectAllMovieFromMaster();
     }
 
 
