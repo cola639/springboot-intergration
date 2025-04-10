@@ -11,19 +11,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/movie")
 public class MovieContoller {
+
     @Autowired
     private IMovieService movieService;
 
-    @GetMapping("/allMovies")
+    @GetMapping("/allMoviesFromSlave")
     public List<Movie> getAllMovie() {
-        System.out.println(movieService.selectAllMovie());
-        return movieService.selectAllMovie();
+
     }
 
     @GetMapping("/allMoviesFromMater")
     public List<Movie> MoviesFromMater() {
-        System.out.println(movieService.selectAllMovieFromMaster());
-        return movieService.selectAllMovie();
     }
 
 
