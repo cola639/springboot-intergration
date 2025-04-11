@@ -1,9 +1,8 @@
-package org.spring.springboot.service.impl;
+package org.spring.springboot.service;
 
 
-import org.spring.springboot.Repository.MovieRepository;
+import org.spring.springboot.repository.MovieRepository;
 import org.spring.springboot.domain.Movie;
-import org.spring.springboot.enums.DataSourceType;
 import org.spring.springboot.service.IMovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

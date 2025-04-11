@@ -1,6 +1,13 @@
 org\spring\springboot\Application.class
+org\spring\springboot\enums\DataSourceType.class
 org\spring\springboot\controller\MovieContoller.class
+org\spring\springboot\config\DataSourceConfig$1.class
+org\spring\springboot\utils\StringUtils.class
+org\spring\springboot\config\DataSourceConfig.class
+org\spring\springboot\repository\MovieRepository.class
+org\spring\springboot\annotation\SourceSwitch.class
+org\spring\springboot\service\MovieServiceImpl.class
 org\spring\springboot\domain\Movie.class
-org\spring\springboot\dao\MovieMapper.class
+org\spring\springboot\aspectj\DataSourceAspect.class
+org\spring\springboot\config\DynamicDataSourceContextHolder.class
 org\spring\springboot\service\IMovieService.class
-org\spring\springboot\service\impl\MovieServiceImpl.class

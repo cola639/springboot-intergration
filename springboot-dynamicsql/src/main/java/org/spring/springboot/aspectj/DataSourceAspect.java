@@ -1,24 +1,21 @@
 package org.spring.springboot.aspectj;
 
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
+
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.spring.springboot.annotation.TargetDataSource;
-import org.spring.springboot.config.DataSourceContextHolder;
+import org.spring.springboot.annotation.SourceSwitch;
+import org.spring.springboot.config.DynamicDataSourceContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Aspect
 @Component
 public class DataSourceAspect {
 
-    @Before("@annotation(targetDataSource)")
-    public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) throws Throwable {
-        DataSourceContextHolder.setDataSourceType(targetDataSource.value());
-    }
-
-    @After("@annotation(targetDataSource)")
-    public void clearDataSource(JoinPoint point, TargetDataSource targetDataSource) {
-        DataSourceContextHolder.clearDataSourceType();
+    @Before("@annotation(sourceSwitch)")
+    public void switchDataSource(SourceSwitch sourceSwitch) {
+        String dataSource = sourceSwitch.value();
+        // 切换数据源逻辑
+        DynamicDataSourceContextHolder.setDataSourceType(dataSource);
     }
 }
