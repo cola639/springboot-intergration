@@ -12,6 +12,7 @@ public class Movie {
 
     @Id  // 指定主键
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // 主键生成策略（这里使用数据库自增策略）
+    @Column(name = "movie_id") // ✅ 改这里为数据库实际主键字段名
     private Long movieId;
 
     @Column(name = "movie_name", nullable = false)  // 映射数据库字段，指定字段名和非空约束
