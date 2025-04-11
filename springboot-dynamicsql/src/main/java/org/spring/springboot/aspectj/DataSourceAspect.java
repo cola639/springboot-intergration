@@ -1,6 +1,8 @@
 package org.spring.springboot.aspectj;
 
 
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.spring.springboot.annotation.SourceSwitch;
@@ -12,10 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class DataSourceAspect {
 
-    @Before("@annotation(sourceSwitch)")
-    public void switchDataSource(SourceSwitch sourceSwitch) {
-        String dataSource = sourceSwitch.value();
-        // 切换数据源逻辑
-        DynamicDataSourceContextHolder.setDataSourceType(dataSource);
+    // 比 @Before + @After error的时候也可以清除
+    @Around("@annotation(sourceSwitch)")
+    public Object switchDataSource(ProceedingJoinPoint joinPoint, SourceSwitch sourceSwitch) throws Throwable {
+        try {
+            // 设置数据源
+            String dataSource = sourceSwitch.value();
+            DynamicDataSourceContextHolder.setDataSourceType(dataSource);
+            return joinPoint.proceed();
+        } finally {
+            // 关键操作：执行完成后清除上下文，防止线程复用引发错乱
+            DynamicDataSourceContextHolder.clearDataSourceType();
+        }
     }
 }
