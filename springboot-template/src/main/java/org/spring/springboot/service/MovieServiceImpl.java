@@ -16,15 +16,11 @@ public class MovieServiceImpl implements IMovieService {
     private MovieRepository movieRepository;
 
 
-    // primary
-    @SourceSwitch("primary")
     @Override
     public List<Movie> selectAllMovieFromMaster() {
         return movieRepository.findAll();
     }
 
-    // secondary
-    @SourceSwitch("secondary")
     @Override
     public List<Movie> selectAllMovieFromSlave() {
         return movieRepository.findAll();
