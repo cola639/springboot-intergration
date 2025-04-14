@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>springboot</groupId>
-    <artifactId>springboot-excel</artifactId>
+    <artifactId>springboot-error</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot-excel</name>
+    <name>springboot-error</name>
 
     <!-- Spring Boot 启动父依赖 -->
     <parent>
@@ -73,7 +73,7 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-
+        <!-- Spring Boot DevTools (for development) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
