@@ -1,6 +1,7 @@
 package org.spring.springboot.service;
 
 
+import org.spring.springboot.exception.movie.MovieException;
 import org.spring.springboot.repository.MovieRepository;
 import org.spring.springboot.domain.Movie;
 import org.spring.springboot.service.IMovieService;
@@ -16,15 +17,22 @@ public class MovieServiceImpl implements IMovieService {
 
 
     @Override
-    public List<Movie> selectAllMovieFromMaster() {
+    public List<Movie> selectAllMovies() {
         return movieRepository.findAll();
     }
 
+    /**
+     * 新增电影
+     *
+     * @param movie
+     */
     @Override
-    public List<Movie> selectAllMovieFromSlave() {
-        return movieRepository.findAll();
+    public Movie addMovie(Movie movie) {
+        if (movie.getMovieName() == null) {
+            throw new MovieException("movie.not.found");
+        }
+
+
+        return movieRepository.save(movie);
     }
-
-
-
 }

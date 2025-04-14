@@ -19,3 +19,7 @@ spring:
   jackson:
     time-zone: Asia/Shanghai
     date-format: yyyy-MM-dd HH:mm:ss
+  #  i18n翻译存放位置
+  messages:
+    basename: i18n/messages  # 不带语言后缀
+    encoding: UTF-8

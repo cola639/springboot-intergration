@@ -3,6 +3,7 @@ package org.spring.springboot.domain;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -15,15 +16,18 @@ public class Movie {
     @Column(name = "movie_id") // ✅ 改这里为数据库实际主键字段名
     private Long movieId;
 
+    @NotNull(message = "{movie.name.notnull}")
     @Column(name = "movie_name", nullable = false)  // 映射数据库字段，指定字段名和非空约束
     private String movieName;
 
-    @Column(name = "movie_description", columnDefinition = "TEXT")  // 映射到数据库字段，类型为 TEXT
+
+    @Column(name = "movie_description")  // 映射到数据库字段，类型为 TEXT
     private String movieDescription;
 
     @Column(name = "movie_cover")
     private String movieCover;
 
+    @NotNull(message = "Movie name cannot be null")
     @Column(name = "movie_score")
     private Float movieScore;
 

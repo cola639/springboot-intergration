@@ -1,15 +1,18 @@
 package org.spring.springboot.service;
 
-
 import org.spring.springboot.domain.Movie;
 
 import java.util.List;
 
 public interface IMovieService {
 
-    List<Movie> selectAllMovieFromSlave();
+    /**
+     * 查询所有电影
+     */
+    List<Movie> selectAllMovies();
 
-    List<Movie> selectAllMovieFromMaster();
-
-
+    /**
+     * 新增电影
+     */
+    Movie addMovie(Movie movie);
 }
