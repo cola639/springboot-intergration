@@ -1,21 +1,30 @@
 package org.spring.springboot.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.spring.springboot.domain.AjaxResult;
 import org.spring.springboot.domain.Movie;
 import org.spring.springboot.exception.ServiceException;
 import org.spring.springboot.service.IMovieService;
+import org.spring.springboot.utils.MessageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/movie")
 public class MovieController {
+    private static final Logger log = LoggerFactory.getLogger(MessageUtils.class);
 
     @Autowired
     private IMovieService movieService;
+
 
     // 1. 获取所有电影
     @GetMapping("/allMovies")
@@ -43,8 +52,9 @@ public class MovieController {
 
     // 5. 模拟 Exception (系统异常)
     @GetMapping("/exception")
-    public List<Movie> triggerException() throws Exception {
-        throw new Exception("系统异常发生");
+    public AjaxResult triggerException(HttpServletRequest request) throws Exception {
+        log.info("请求头语言: {}", request.getHeader("Accept-Language"));
+        return AjaxResult.error(MessageUtils.message("movie.system.error"));
     }
 
     // 6. 模拟 BindException (字段绑定异常)
