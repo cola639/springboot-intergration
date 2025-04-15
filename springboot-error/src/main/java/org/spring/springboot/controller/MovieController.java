@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.spring.springboot.domain.AjaxResult;
 import org.spring.springboot.domain.Movie;
 import org.spring.springboot.exception.ServiceException;
+import org.spring.springboot.exception.movie.MovieException;
 import org.spring.springboot.service.IMovieService;
 import org.spring.springboot.utils.MessageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +40,11 @@ public class MovieController {
     }
 
     // 3. 模拟 ServiceException (业务异常)
-    @GetMapping("/error")
-    public List<Movie> triggerServiceException() {
-        throw new ServiceException("业务处理出错", 500);
+    @GetMapping("/serviceError")
+    public AjaxResult triggerServiceException() {
+        AjaxResult ajax = AjaxResult.success();
+        movieService.deleteMovie(null);
+        return ajax;
     }
 
     // 4. 模拟 RuntimeException (运行时异常)

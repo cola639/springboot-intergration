@@ -35,4 +35,17 @@ public class MovieServiceImpl implements IMovieService {
 
         return movieRepository.save(movie);
     }
+
+    /**
+     * 删除电影
+     *
+     * @param id
+     */
+    @Override
+    public void deleteMovie(Long id) {
+        if (id == null) {
+            throw new MovieException("movie.not.found");
+        }
+        movieRepository.deleteById(id);
+    }
 }

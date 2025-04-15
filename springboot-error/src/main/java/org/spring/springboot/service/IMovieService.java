@@ -15,4 +15,9 @@ public interface IMovieService {
      * 新增电影
      */
     Movie addMovie(Movie movie);
+
+    /**
+     * 删除电影
+     */
+    void deleteMovie(Long id);
 }
