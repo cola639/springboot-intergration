@@ -26,6 +26,7 @@ public class SeckillController {
 
     @PostMapping("/{productId}")
     public String seckill(@PathVariable Long productId) {
+
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (!optionalProduct.isPresent()) {
             return "商品不存在";
