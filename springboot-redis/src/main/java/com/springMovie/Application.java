@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan("com.springMovie.mapper")
-public class SpringMovieApplication {
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringMovieApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
 }
