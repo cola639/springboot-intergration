@@ -11,6 +11,11 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
 
+  redis:
+    host: 64.112.41.32
+    port: 6161
+    database: 0
+
   jpa:
     hibernate:
       ddl-auto: update
