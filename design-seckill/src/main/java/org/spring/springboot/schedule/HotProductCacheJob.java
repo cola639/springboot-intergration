@@ -29,7 +29,6 @@ public class HotProductCacheJob {
             return;
         }
 
-        log.info("🔥 定时任务执行中...");
         long productId = 1L;
         String redisKey = "seckill:stock:" + productId;
 
