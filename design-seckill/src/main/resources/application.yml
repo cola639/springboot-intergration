@@ -16,6 +16,16 @@ spring:
     port: 6161
     database: 0
 
+  kafka:
+    bootstrap-servers: 64.112.41.32:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: seckill-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
   jpa:
     hibernate:
       ddl-auto: update
