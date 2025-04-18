@@ -32,11 +32,11 @@ public class HotProductCacheJob {
         long productId = 1L;
         String redisKey = "seckill:stock:" + productId;
 
-        Boolean hasKey = redisTemplate.hasKey(redisKey);
-        if (Boolean.TRUE.equals(hasKey)) {
-            log.debug("商品 [{}] 已存在于 Redis 缓存中，跳过缓存", productId);
-            return;
-        }
+//        Boolean hasKey = redisTemplate.hasKey(redisKey);
+//        if (Boolean.TRUE.equals(hasKey)) {
+//            log.debug("商品 [{}] 已存在于 Redis 缓存中，跳过缓存", productId);
+//            return;
+//        }
 
         productRepository.findById(productId).ifPresent(product -> {
             Integer stock = product.getStock();
