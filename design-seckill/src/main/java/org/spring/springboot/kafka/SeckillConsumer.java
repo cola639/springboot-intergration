@@ -25,22 +25,6 @@ public class SeckillConsumer {
 
 
 
-    @KafkaListener(topics = "seckill_topic", groupId = "seckill-group", containerFactory = "kafkaListenerContainerFactory")
-    public void consumeDeadLine(String message) {
-        log.info("🎯 收到 Kafka 消息: {}", message);
 
-        Long productId = Long.valueOf(message);
-
-        // 模拟异常重试测试
-        if ("999".equals(message)) {
-            throw new RuntimeException("模拟异常");
-        }
-
-        productRepository.findById(productId).ifPresent(product -> {
-            product.setStock(product.getStock() - 1);
-            productRepository.save(product);
-            log.info("✅ 成功消费并更新库存：{}", productId);
-        });
-    }
 
 }
