@@ -16,14 +16,10 @@ public class MovieServiceImpl implements IMovieService {
 
 
     @Override
-    public List<Movie> selectAllMovieFromMaster() {
+    public List<Movie> selectAllMovie() {
         return movieRepository.findAll();
     }
 
-    @Override
-    public List<Movie> selectAllMovieFromSlave() {
-        return movieRepository.findAll();
-    }
 
 
 

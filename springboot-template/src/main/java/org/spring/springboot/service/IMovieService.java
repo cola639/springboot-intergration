@@ -7,9 +7,7 @@ import java.util.List;
 
 public interface IMovieService {
 
-    List<Movie> selectAllMovieFromSlave();
-
-    List<Movie> selectAllMovieFromMaster();
+    List<Movie> selectAllMovie();
 
 
 }
