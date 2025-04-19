@@ -18,7 +18,7 @@ public class Movie {
     @Column(name = "movie_name", nullable = false)  // 映射数据库字段，指定字段名和非空约束
     private String movieName;
 
-    @Column(name = "movie_description", columnDefinition = "TEXT")  // 映射到数据库字段，类型为 TEXT
+    @Column(name = "movie_description")
     private String movieDescription;
 
     @Column(name = "movie_cover")

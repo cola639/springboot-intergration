@@ -20,10 +20,5 @@ public class MovieContoller {
         return movieService.selectAllMovieFromSlave();
     }
 
-    @GetMapping("/allMoviesFromMater")
-    public List<Movie> MoviesFromMater() {
-        return movieService.selectAllMovieFromMaster();
-    }
-
 
 }
