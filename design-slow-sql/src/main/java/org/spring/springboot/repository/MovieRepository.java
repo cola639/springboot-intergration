@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
 
+    Movie findByMovieUuid(String movieUuid);
 }

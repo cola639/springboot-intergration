@@ -6,7 +6,7 @@
     <groupId>springboot</groupId>
     <artifactId>springboot-template</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot-template</name>
+    <name>design-slow-sql</name>
 
     <!-- Spring Boot 启动父依赖 -->
     <parent>

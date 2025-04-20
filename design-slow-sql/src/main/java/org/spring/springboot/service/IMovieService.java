@@ -9,5 +9,6 @@ public interface IMovieService {
 
     List<Movie> selectAllMovie();
 
+    Movie findByMovieUuid(String movieUuid);
 
 }

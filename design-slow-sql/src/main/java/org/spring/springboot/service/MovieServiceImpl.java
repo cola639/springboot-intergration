@@ -20,7 +20,14 @@ public class MovieServiceImpl implements IMovieService {
         return movieRepository.findAll();
     }
 
-
+    /**
+     * @param movieUuid
+     * @return
+     */
+    @Override
+    public Movie findByMovieUuid(String movieUuid) {
+        return movieRepository.findByMovieUuid(movieUuid);
+    }
 
 
 }

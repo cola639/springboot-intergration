@@ -15,7 +15,12 @@ public class MovieContoller {
     @Autowired
     private IMovieService movieService;
 
-    @GetMapping("/allMoviesFromSlave")
+    @GetMapping("/getByUuid/{uuid}")
+    public Movie getMovieByUuid(@PathVariable("uuid") String movieUuid) {
+        return movieService.findByMovieUuid(movieUuid);
+    }
+
+    @GetMapping("/allMovies")
     public List<Movie> getAllMovie() {
         return movieService.selectAllMovie();
     }
