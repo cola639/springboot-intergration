@@ -17,7 +17,7 @@ public class MovieContoller {
 
     @GetMapping("/allMoviesFromSlave")
     public List<Movie> getAllMovie() {
-        return movieService.selectAllMovieFromSlave();
+        return movieService.selectAllMovie();
     }
 
 
