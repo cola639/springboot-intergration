@@ -15,7 +15,7 @@ public class MovieContoller {
     @Autowired
     private IMovieService movieService;
 
-    @GetMapping("/allMoviesFromSlave")
+    @GetMapping("/allMovies")
     public List<Movie> getAllMovie() {
         return movieService.selectAllMovie();
     }

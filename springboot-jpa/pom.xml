@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>springboot</groupId>
-    <artifactId>springboot-template</artifactId>
+    <artifactId>springboot-jpa</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot-template</name>
+    <name>springboot-jpa</name>
 
     <!-- Spring Boot 启动父依赖 -->
     <parent>
