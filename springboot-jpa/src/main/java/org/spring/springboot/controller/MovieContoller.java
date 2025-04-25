@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/movie")
+@RequestMapping("/movies")
 public class MovieContoller {
 
     @Autowired
     private IMovieService movieService;
 
-    @GetMapping("/allMoviesFromSlave")
+    @GetMapping("/allMovies")
     public List<Movie> getAllMovie() {
         return movieService.selectAllMovie();
     }
