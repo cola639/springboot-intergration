@@ -21,4 +21,9 @@ public class MovieContoller {
     }
 
 
+    // 根据演员 ID 查询出演的所有电影
+    @GetMapping("/byActor")
+    public List<Movie> getMoviesByActor(@RequestParam Long actorId) {
+        return movieService.getMoviesByActorId(actorId);
+    }
 }

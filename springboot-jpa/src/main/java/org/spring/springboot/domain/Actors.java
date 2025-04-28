@@ -1,5 +1,6 @@
 package org.spring.springboot.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
@@ -10,15 +11,16 @@ import java.util.List;
 @Entity
 @Table(name = "actors")
 public class Actors {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Use IDENTITY for auto-increment
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 自动递增
     @Column(name = "id")
     private Long id;
 
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToMany(mappedBy = "actors") // 这里的"actors"应该与Movie类中的属性名一致
-    @JsonBackReference // 防止在序列化过程中无限递归
-    private List<Movie> movies;
+    @ManyToMany(mappedBy = "actors")  // 使用 EAGER 加载
+    @JsonBackReference  // 防止循环引用，避免序列化 movies
+    private List<Movie> movies;  // 电影集合
 }

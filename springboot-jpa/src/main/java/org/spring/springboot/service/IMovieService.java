@@ -9,5 +9,5 @@ public interface IMovieService {
 
     List<Movie> selectAllMovie();
 
-
+    List<Movie> getMoviesByActorId(Long actorId);
 }

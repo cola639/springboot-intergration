@@ -21,6 +21,9 @@ public class MovieServiceImpl implements IMovieService {
     }
 
 
-
+    // 根据演员ID查找所有电影
+    public List<Movie> getMoviesByActorId(Long actorId) {
+        return movieRepository.findMoviesByActorId(actorId);
+    }
 
 }
