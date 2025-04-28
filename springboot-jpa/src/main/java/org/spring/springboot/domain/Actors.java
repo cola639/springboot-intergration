@@ -20,7 +20,7 @@ public class Actors {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToMany(mappedBy = "actors")  // 使用 EAGER 加载
+    @ManyToMany(mappedBy = "actors")
     @JsonBackReference  // 防止循环引用，避免序列化 movies
-    private List<Movie> movies;  // 电影集合
+    private List<Movie> movies;
 }
