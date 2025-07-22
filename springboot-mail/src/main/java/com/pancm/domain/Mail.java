@@ -1,4 +1,4 @@
-package com.pancm.pojo;
+package com.pancm.domain;
 
 /**
 * @Title: Mail

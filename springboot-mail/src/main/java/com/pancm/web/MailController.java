@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import com.pancm.pojo.Mail;
+import com.pancm.domain.Mail;
 
 /**
  * 
