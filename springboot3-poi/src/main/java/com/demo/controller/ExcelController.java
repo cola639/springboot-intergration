@@ -28,13 +28,7 @@ public class ExcelController {
         );
     }
 
-    /** 简单字典转换 */
-    private String convertDict(String dict, String value) {
-        if ("sys_normal_disable".equals(dict)) {
-            return "0".equals(value) ? "正常" : "停用";
-        }
-        return value;
-    }
+
 
     @GetMapping("/demo/users/export")
     public void exportUsers(HttpServletResponse response) {

@@ -18,8 +18,13 @@ public class User {
     @Xls(name = "状态", order = 4, dict = "sys_normal_disable", width = 10)
     private String status;
 
+    @Xls(name = "年龄", order = 6, dict = "sys_age_range", width = 10)
+    private String ageRange;
+
     @Xls(name = "创建时间", order = 5, dateFormat = "yyyy-MM-dd HH:mm:ss", width = 22)
     private Date createTime;
+
+
 
     public User(Long userId, String userName, String sex, String status, Date createTime) {
         this.userId = userId;
