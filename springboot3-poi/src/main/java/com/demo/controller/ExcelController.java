@@ -3,6 +3,7 @@ package com.demo.controller;
 
 import com.demo.domain.User;
 import com.demo.utils.DictProvider;
+import com.demo.utils.DictResult;
 import com.demo.utils.SimpleExcelWriter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
@@ -34,14 +35,14 @@ public class ExcelController {
     public void exportUsers(HttpServletResponse response) {
 
 
-        // 示例的字典提供者（可接 RuoYi 的 DictUtils，也可自实现）
         DictProvider dict = (dictType, value) -> {
             if ("sys_normal_disable".equals(dictType)) {
-                if ("0".equals(value)) return "正常";
-                if ("1".equals(value)) return "停用";
+                if ("0".equals(value)) return new DictResult("正常", "#FF0000");
+                if ("1".equals(value)) return new DictResult("停用", "#00FF00");
             }
-            return null;
+            return new DictResult(value, null);
         };
+
 
         SimpleExcelWriter.export(mockUsers(), User.class, response,
                 "用户导出", "用户列表", dict);

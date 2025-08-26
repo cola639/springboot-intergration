@@ -5,7 +5,8 @@ import com.demo.utils.DictProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -76,11 +77,35 @@ public class SimpleExcelWriter {
                 Col col = cols.get(i);
                 Object raw = fieldValue(rowObj, col.field);
                 String str = formatValue(raw, col, dictProvider);
-                // 仅做字符串写入（最简）；也可按需判断写 number
-                cell.setCellStyle(styles.data.get(i));
+
+                // 默认样式
+                CellStyle cellStyle = styles.data.get(i);
+
+                // extra: set dynamic color if available
+                String hexColor = resolveColor(raw, col, dictProvider);
+                if (hexColor != null) {
+                    if (hexColor.startsWith("#")) {
+                        hexColor = hexColor.substring(1);
+                    }
+                    java.awt.Color awtColor = new java.awt.Color(
+                            Integer.valueOf(hexColor.substring(0, 2), 16),
+                            Integer.valueOf(hexColor.substring(2, 4), 16),
+                            Integer.valueOf(hexColor.substring(4, 6), 16)
+                    );
+                    XSSFColor poiColor = new XSSFColor(awtColor, null);
+                    CellStyle colored = wb.createCellStyle();
+                    colored.cloneStyleFrom(styles.data.get(i));
+                    ((XSSFCellStyle) colored).setFillForegroundColor(poiColor);
+                    colored.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    cellStyle = colored; // 使用动态颜色 style
+                }
+
+                // 应用最终样式 + 值
+                cell.setCellStyle(cellStyle);
                 cell.setCellValue(str);
             }
         }
+
     }
 
     private static class Styles {
@@ -91,7 +116,7 @@ public class SimpleExcelWriter {
     private static Styles buildStyles(Workbook wb, List<Col> cols) {
         Styles s = new Styles();
         s.header = new ArrayList<>(cols.size());
-        s.data   = new ArrayList<>(cols.size());
+        s.data = new ArrayList<>(cols.size());
 
         for (Col c : cols) {
             // header
@@ -106,7 +131,7 @@ public class SimpleExcelWriter {
             hf.setBold(true);
             hf.setColor(c.headerFont.getIndex());
             hf.setFontName("Arial");
-            hf.setFontHeightInPoints((short)10);
+            hf.setFontHeightInPoints((short) 10);
             h.setFont(hf);
 
             // data
@@ -116,7 +141,7 @@ public class SimpleExcelWriter {
             setBorder(d);
             Font df = wb.createFont();
             df.setFontName("Arial");
-            df.setFontHeightInPoints((short)10);
+            df.setFontHeightInPoints((short) 10);
             d.setFont(df);
 
             s.header.add(h);
@@ -141,7 +166,7 @@ public class SimpleExcelWriter {
     private static class Col {
         Field field;
         String name;
-        int    width;
+        int width;
         String dateFormat;
         String converterExp;
         String dictType;
@@ -164,7 +189,7 @@ public class SimpleExcelWriter {
                     Xls x = f.getAnnotation(Xls.class);
                     Col c = new Col();
                     c.field = f;
-                    c.name  = x.name();
+                    c.name = x.name();
                     c.width = x.width();
                     c.dateFormat = x.dateFormat();
                     c.converterExp = x.converterExp();
@@ -186,39 +211,41 @@ public class SimpleExcelWriter {
         }
     }
 
+    private static String resolveColor(Object val, Col col, DictProvider dictProvider) {
+        if (val == null) return null;
+        if (!col.dictType.isEmpty() && dictProvider != null) {
+            DictResult dr = dictProvider.getDict(col.dictType, String.valueOf(val));
+            if (dr != null) {
+                return dr.getColor();
+            }
+        }
+        return null;
+    }
+
     private static String formatValue(Object val, Col col, DictProvider dictProvider) {
         if (val == null) return "";
-        // 1) 日期
-        if (!col.dateFormat.isEmpty()) {
-            Date date = null;
-            if (val instanceof Date) {
-                date = (Date) val;
-            } else if (val instanceof java.time.LocalDateTime) {
-                date = java.util.Date.from(((java.time.LocalDateTime) val)
-                        .atZone(java.time.ZoneId.systemDefault()).toInstant());
-            } else if (val instanceof java.time.LocalDate) {
-                date = java.util.Date.from(((java.time.LocalDate) val)
-                        .atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
-            }
-            if (date != null) {
-                return new SimpleDateFormat(col.dateFormat).format(date);
-            }
-            // 若给了 dateFormat 但不是日期，退化为 toString
-            return String.valueOf(val);
-        }
-
         String s = String.valueOf(val);
 
-        // 2) converterExp: "0=禁用,1=正常"
+        // 1) 日期格式
+        if (!col.dateFormat.isEmpty()) {
+            if (val instanceof Date) {
+                return new SimpleDateFormat(col.dateFormat).format((Date) val);
+            }
+            return s;
+        }
+
+        // 2) converterExp
         if (!col.converterExp.isEmpty()) {
             String mapped = mapByExp(s, col.converterExp);
             if (mapped != null) return mapped;
         }
 
-        // 3) 字典
+        // 3) dict
         if (!col.dictType.isEmpty() && dictProvider != null) {
-            String label = dictProvider.getLabel(col.dictType, s);
-            if (label != null) return label;
+            DictResult dr = dictProvider.getDict(col.dictType, s);
+            if (dr != null && dr.getLabel() != null) {
+                return dr.getLabel();
+            }
         }
 
         // 4) BigDecimal 去除多余小数（可选）
