@@ -1,9 +1,10 @@
 package com.demo.controller;
 
-
+import com.demo.domain.Department;
 import com.demo.domain.User;
 import com.demo.utils.DictProvider;
 import com.demo.utils.DictResult;
+import com.demo.utils.MultiSheetExcelWriter;
 import com.demo.utils.SimpleExcelWriter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
@@ -13,9 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class ExcelController {
@@ -29,11 +28,17 @@ public class ExcelController {
         );
     }
 
-
+    /** Mock departments */
+    private List<Department> mockDepartments() {
+        return Arrays.asList(
+                new Department(100L, "研发部", "0", new Date()),
+                new Department(101L, "市场部", "1", new Date()),
+                new Department(102L, "人事部", "0", new Date())
+        );
+    }
 
     @GetMapping("/demo/users/export")
     public void exportUsers(HttpServletResponse response) {
-
 
         DictProvider dict = (dictType, value) -> {
             if ("sys_normal_disable".equals(dictType)) {
@@ -43,9 +48,16 @@ public class ExcelController {
             return new DictResult(value, null);
         };
 
+        Map<String, List<?>> dataMap = new LinkedHashMap<>();
+        dataMap.put("用户列表", mockUsers());
+        dataMap.put("部门列表", mockDepartments());
 
-        SimpleExcelWriter.export(mockUsers(), User.class, response,
-                "用户导出", "用户列表", dict);
+        Map<String, Class<?>> clazzMap = new HashMap<>();
+        clazzMap.put("用户列表", User.class);
+        clazzMap.put("部门列表", Department.class);
+
+        MultiSheetExcelWriter.export(dataMap, clazzMap, response, "多Sheet导出", dict);
+
     }
 
     @GetMapping("/excel/download")
@@ -82,4 +94,5 @@ public class ExcelController {
             throw new RuntimeException("导出失败", e);
         }
     }
+
 }

@@ -51,7 +51,7 @@ public class SimpleExcelWriter {
 
     /* ================== 内部实现 ================== */
 
-    private static <T> void writeWorkbook(Workbook wb, List<T> data, Class<T> clazz,
+    public static <T> void writeWorkbook(Workbook wb, List<T> data, Class<T> clazz,
                                           String sheetName, DictProvider dictProvider) throws Exception {
         if (data == null) data = Collections.emptyList();
         Sheet sheet = wb.createSheet(sheetName == null ? "Sheet1" : sheetName);
