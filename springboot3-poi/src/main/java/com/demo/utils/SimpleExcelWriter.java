@@ -4,6 +4,7 @@ import com.demo.annotation.Xls;
 import com.demo.annotation.XlsRichText;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -155,7 +156,15 @@ public class SimpleExcelWriter {
                 cell.setCellStyle(cellStyle);
                 cell.setCellValue(str);
             }
+
+
+
         }
+
+        int lastRow = sheet.getLastRowNum();
+        int lastCol = cols.size() - 1;
+
+        fillRemaining(wb, sheet, lastRow, lastCol);
     }
 
     private static class Styles {
@@ -331,5 +340,55 @@ public class SimpleExcelWriter {
             }
         }
         return null;
+    }
+
+    /* ---------- 合并行列 ---------- */
+    private static void fillRemaining(Workbook wb, Sheet sheet, int lastDataRow, int lastDataCol) {
+        // 我们限定 200 行 × 50 列 的区域，避免 SXSSF 崩溃
+        int targetRow = lastDataRow + 200;  // 向下扩展 200 行
+        int targetCol = lastDataCol + 50;   // 向右扩展 50 列
+
+        // 白色背景样式
+        CellStyle whiteStyle = wb.createCellStyle();
+        whiteStyle.setFillForegroundColor(IndexedColors.WHITE.getIndex());
+        whiteStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        // === 1) 右侧空白列合并 ===
+        if (targetCol > lastDataCol + 1) {
+            CellRangeAddress rightRegion = new CellRangeAddress(
+                    0, lastDataRow,           // 从表头到最后一行数据
+                    lastDataCol + 1, targetCol
+            );
+            sheet.addMergedRegion(rightRegion);
+
+            Row row = sheet.getRow(0);
+            if (row == null) row = sheet.createRow(0);
+            Cell cell = row.createCell(lastDataCol + 1);
+            cell.setCellStyle(whiteStyle);
+        }
+
+        // === 2) 底部空白行合并 ===
+        if (targetRow > lastDataRow + 1) {
+            CellRangeAddress bottomRegion = new CellRangeAddress(
+                    lastDataRow + 1, targetRow,
+                    0, lastDataCol
+            );
+            sheet.addMergedRegion(bottomRegion);
+
+            Row row = sheet.createRow(lastDataRow + 1);
+            Cell cell = row.createCell(0);
+            cell.setCellStyle(whiteStyle);
+        }
+
+        // === 3) 右下角整块空白合并 ===
+        CellRangeAddress cornerRegion = new CellRangeAddress(
+                lastDataRow + 1, targetRow,
+                lastDataCol + 1, targetCol
+        );
+        sheet.addMergedRegion(cornerRegion);
+
+        Row cornerRow = sheet.createRow(lastDataRow + 1);
+        Cell cornerCell = cornerRow.createCell(lastDataCol + 1);
+        cornerCell.setCellStyle(whiteStyle);
     }
 }
