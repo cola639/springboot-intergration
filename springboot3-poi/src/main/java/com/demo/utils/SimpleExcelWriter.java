@@ -1,12 +1,14 @@
 package com.demo.utils;
 
 import com.demo.annotation.Xls;
-import com.demo.utils.DictProvider;
+import com.demo.annotation.XlsRichText;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -62,9 +64,56 @@ public class SimpleExcelWriter {
         // 3) 表头
         Row header = sheet.createRow(0);
         for (int i = 0; i < cols.size(); i++) {
-            Cell c = header.createCell(i);
-            c.setCellValue(cols.get(i).name);
-            c.setCellStyle(styles.header.get(i)); // 每列可有不同表头色
+            Cell cell = header.createCell(i);
+            Col col = cols.get(i);
+
+            if (col.headerRichTexts != null && col.headerRichTexts.length > 0) {
+                // ========== 构建 RichText ==========
+                XSSFRichTextString rich = new XSSFRichTextString();
+                for (XlsRichText rt : col.headerRichTexts) {
+                    XSSFFont xf = (XSSFFont) wb.createFont();
+                    xf.setFontName(col.headerFontFamily != null ? col.headerFontFamily : "Arial");
+                    xf.setFontHeightInPoints(rt.fontSize());
+                    xf.setBold(rt.bold());
+                    xf.setItalic(rt.italic());
+
+                    // 设置颜色
+                    if (rt.color().startsWith("#") && rt.color().length() == 7) {
+                        java.awt.Color awtColor = new java.awt.Color(
+                                Integer.valueOf(rt.color().substring(1, 3), 16),
+                                Integer.valueOf(rt.color().substring(3, 5), 16),
+                                Integer.valueOf(rt.color().substring(5, 7), 16)
+                        );
+                        XSSFColor poiColor = new XSSFColor(awtColor, null);
+                        xf.setColor(poiColor);
+                    }
+
+                    // 拼接 marginRight（追加空格或全角空格）
+                    StringBuilder textWithMargin = new StringBuilder(rt.text());
+                    if (rt.marginRight() > 0) {
+                        for (int j = 0; j < rt.marginRight(); j++) {
+                            textWithMargin.append(" "); // 或 "\u2003" 全角空格
+                        }
+                    }
+
+                    rich.append(textWithMargin.toString(), xf);
+                }
+
+                cell.setCellValue(rich);
+
+                // ========== 应用 header 样式（但不覆盖字体） ==========
+                CellStyle baseStyle = wb.createCellStyle();
+                baseStyle.cloneStyleFrom(styles.header.get(i));
+                baseStyle.setFont(null); // ⚠️ 移除原字体，避免覆盖 RichText 的 XSSFFont
+                cell.setCellStyle(baseStyle);
+
+            } else {
+                // 普通表头
+                cell.setCellValue(col.name);
+                cell.setCellStyle(styles.header.get(i));
+            }
+
+            // 设置列宽
             sheet.setColumnWidth(i, (int) ((cols.get(i).width + 0.72) * 256));
         }
 
@@ -87,17 +136,19 @@ public class SimpleExcelWriter {
                     if (hexColor.startsWith("#")) {
                         hexColor = hexColor.substring(1);
                     }
-                    java.awt.Color awtColor = new java.awt.Color(
-                            Integer.valueOf(hexColor.substring(0, 2), 16),
-                            Integer.valueOf(hexColor.substring(2, 4), 16),
-                            Integer.valueOf(hexColor.substring(4, 6), 16)
-                    );
-                    XSSFColor poiColor = new XSSFColor(awtColor, null);
-                    CellStyle colored = wb.createCellStyle();
-                    colored.cloneStyleFrom(styles.data.get(i));
-                    ((XSSFCellStyle) colored).setFillForegroundColor(poiColor);
-                    colored.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-                    cellStyle = colored; // 使用动态颜色 style
+                    if (hexColor.length() == 6) { // 安全校验
+                        java.awt.Color awtColor = new java.awt.Color(
+                                Integer.valueOf(hexColor.substring(0, 2), 16),
+                                Integer.valueOf(hexColor.substring(2, 4), 16),
+                                Integer.valueOf(hexColor.substring(4, 6), 16)
+                        );
+                        XSSFColor poiColor = new XSSFColor(awtColor, null);
+                        CellStyle colored = wb.createCellStyle();
+                        colored.cloneStyleFrom(styles.data.get(i));
+                        ((XSSFCellStyle) colored).setFillForegroundColor(poiColor);
+                        colored.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                        cellStyle = colored; // 使用动态颜色 style
+                    }
                 }
 
                 // 应用最终样式 + 值
@@ -105,7 +156,6 @@ public class SimpleExcelWriter {
                 cell.setCellValue(str);
             }
         }
-
     }
 
     private static class Styles {
@@ -128,10 +178,10 @@ public class SimpleExcelWriter {
             setBorder(h);
 
             Font hf = wb.createFont();
-            hf.setBold(true);
+            hf.setBold(c.headerBold);
             hf.setColor(c.headerFont.getIndex());
-            hf.setFontName("Arial");
-            hf.setFontHeightInPoints((short) 10);
+            hf.setFontName(c.headerFontFamily != null ? c.headerFontFamily : "Arial");
+            hf.setFontHeightInPoints(c.headerFontSize);
             h.setFont(hf);
 
             // data
@@ -140,8 +190,9 @@ public class SimpleExcelWriter {
             d.setVerticalAlignment(VerticalAlignment.CENTER);
             setBorder(d);
             Font df = wb.createFont();
-            df.setFontName("Arial");
-            df.setFontHeightInPoints((short) 10);
+            df.setFontName(c.fontFamily);
+            df.setFontHeightInPoints(c.fontSize);
+            df.setBold(c.bold);
             d.setFont(df);
 
             s.header.add(h);
@@ -162,7 +213,6 @@ public class SimpleExcelWriter {
     }
 
     /* ---------- 字段解析与值格式化 ---------- */
-
     private static class Col {
         Field field;
         String name;
@@ -173,6 +223,14 @@ public class SimpleExcelWriter {
         HorizontalAlignment align;
         IndexedColors headerBg;
         IndexedColors headerFont;
+        // extra config
+        short fontSize;
+        boolean bold;
+        String fontFamily;
+        short headerFontSize;
+        boolean headerBold;
+        String headerFontFamily;
+        XlsRichText[] headerRichTexts;
     }
 
     private static <T> List<Col> parseCols(Class<T> clazz) {
@@ -197,6 +255,13 @@ public class SimpleExcelWriter {
                     c.align = x.align();
                     c.headerBg = x.headerBg();
                     c.headerFont = x.headerFont();
+                    c.fontSize = x.fontSize();
+                    c.bold = x.bold();
+                    c.fontFamily = x.fontFamily();
+                    c.headerFontSize = x.headerFontSize();
+                    c.headerBold = x.headerBold();
+                    c.headerFontFamily = x.headerFontFamily();
+                    c.headerRichTexts = x.headerRichText();
                     return c;
                 })
                 .collect(Collectors.toList());
@@ -248,7 +313,7 @@ public class SimpleExcelWriter {
             }
         }
 
-        // 4) BigDecimal 去除多余小数（可选）
+        // 4) BigDecimal 去除多余小数
         if (val instanceof BigDecimal) {
             return ((BigDecimal) val).stripTrailingZeros().toPlainString();
         }

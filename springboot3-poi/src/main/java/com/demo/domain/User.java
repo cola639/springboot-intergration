@@ -1,12 +1,19 @@
 package com.demo.domain;
 
 import com.demo.annotation.Xls;
+import com.demo.annotation.XlsRichText;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 import java.util.Date;
 
 public class User {
-    @Xls(name = "用户ID", order = 1, align = HorizontalAlignment.RIGHT, width = 10)
+    @Xls(
+            name = "用户ID", order = 6, width = 25, headerRichText = {
+            @XlsRichText(text = "GB/GF", color = "#FF0000", fontSize = 12, bold = true, marginRight = 2),
+            @XlsRichText(text = "[", fontSize = 12),
+            @XlsRichText(text = "level4", color = "#00FF00", fontSize = 10, italic = true),
+            @XlsRichText(text = "]", fontSize = 12)
+    })
     private Long userId;
 
     @Xls(name = "用户名", order = 2, width = 18)
