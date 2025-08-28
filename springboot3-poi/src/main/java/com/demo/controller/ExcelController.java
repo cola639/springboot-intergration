@@ -1,6 +1,7 @@
 package com.demo.controller;
 
 import com.demo.domain.Department;
+import com.demo.domain.Student;
 import com.demo.domain.User;
 import com.demo.utils.DictProvider;
 import com.demo.utils.DictResult;
@@ -59,6 +60,26 @@ public class ExcelController {
         MultiSheetExcelWriter.export(dataMap, clazzMap, response, "多Sheet导出", dict);
 
     }
+
+    @GetMapping("/demo/users/export/mergeRow")
+    public void exportMergeRow(HttpServletResponse response) {
+        // mock 数据
+        List<Student> students = Arrays.asList(
+                new Student(1L, "man", "class 1"),
+                new Student(2L, "man", "class 1"),
+                new Student(3L, "man", "class 1"),
+                new Student(4L, "man", "class 2"),
+                new Student(5L, "man", "class 2")
+        );
+
+        // 空字典实现（这里不做翻译）
+        DictProvider dict = (dictType, value) -> null;
+
+        // 调用导出工具
+        SimpleExcelWriter.export(students, Student.class, response,
+                "学生导出", "学生列表", dict);
+    }
+
 
     @GetMapping("/excel/download")
     public void download(HttpServletResponse response) {

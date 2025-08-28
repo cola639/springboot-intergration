@@ -29,5 +29,9 @@ public @interface Xls {
 
     /** ===== Rich Text Header ===== */
     XlsRichText[] headerRichText() default {};
+
+    /** ===== Extra Config ===== */
+    boolean merge() default false;  // 👈 new: whether to merge same value cells vertically
+    String type() default "";       // 👈 optional: special type like "url"
 }
 

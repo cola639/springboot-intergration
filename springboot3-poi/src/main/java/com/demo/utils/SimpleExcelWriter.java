@@ -52,7 +52,7 @@ public class SimpleExcelWriter {
     /* ================== 内部实现 ================== */
 
     public static <T> void writeWorkbook(Workbook wb, List<T> data, Class<T> clazz,
-                                          String sheetName, DictProvider dictProvider) throws Exception {
+                                         String sheetName, DictProvider dictProvider) throws Exception {
         if (data == null) data = Collections.emptyList();
         Sheet sheet = wb.createSheet(sheetName == null ? "Sheet1" : sheetName);
 
@@ -157,12 +157,17 @@ public class SimpleExcelWriter {
                 cell.setCellValue(str);
             }
 
-
-
         }
 
         int lastRow = sheet.getLastRowNum();
         int lastCol = cols.size() - 1;
+
+        // === auto merge columns with @Xls(merge = true) ===
+        for (int i = 0; i < cols.size(); i++) {
+            if (cols.get(i).merge) {
+                mergeSameRows(sheet, 1, lastRow, i); // 从第1行（数据行起始）到最后一行
+            }
+        }
 
         fillRemaining(wb, sheet, lastRow, lastCol);
     }
@@ -240,6 +245,10 @@ public class SimpleExcelWriter {
         boolean headerBold;
         String headerFontFamily;
         XlsRichText[] headerRichTexts;
+
+        // new
+        boolean merge;
+        String type;
     }
 
     private static <T> List<Col> parseCols(Class<T> clazz) {
@@ -271,6 +280,8 @@ public class SimpleExcelWriter {
                     c.headerBold = x.headerBold();
                     c.headerFontFamily = x.headerFontFamily();
                     c.headerRichTexts = x.headerRichText();
+                    c.merge = x.merge();
+                    c.type = x.type();
                     return c;
                 })
                 .collect(Collectors.toList());
@@ -343,6 +354,47 @@ public class SimpleExcelWriter {
     }
 
     /* ---------- 合并行列 ---------- */
+
+    /**
+     * Helper: safely get string value from cell
+     */
+    private static String getCellValue(Cell cell) {
+        if (cell == null) return null;
+        cell.setCellType(CellType.STRING);
+        return cell.getStringCellValue();
+    }
+
+    /**
+     * Merge rows if values are same in specified columns.
+     *
+     * @param sheet     target sheet
+     * @param startRow  start row index (usually headerRow+1)
+     * @param endRow    last data row index
+     * @param mergeCols column indexes to merge (e.g. [2] means merge "className" column)
+     */
+    private static void mergeSameRows(Sheet sheet, int startRow, int endRow, int... mergeCols) {
+        for (int col : mergeCols) {
+            int rowStart = startRow;
+            String prev = getCellValue(sheet.getRow(rowStart).getCell(col));
+
+            for (int row = startRow + 1; row <= endRow; row++) {
+                String curr = getCellValue(sheet.getRow(row).getCell(col));
+                if (!Objects.equals(curr, prev)) {
+                    // merge [rowStart..row-1]
+                    if (row - 1 > rowStart) {
+                        sheet.addMergedRegion(new CellRangeAddress(rowStart, row - 1, col, col));
+                    }
+                    rowStart = row;
+                    prev = curr;
+                }
+            }
+            // 最后一段
+            if (endRow > rowStart) {
+                sheet.addMergedRegion(new CellRangeAddress(rowStart, endRow, col, col));
+            }
+        }
+    }
+
     private static void fillRemaining(Workbook wb, Sheet sheet, int lastDataRow, int lastDataCol) {
         // 我们限定 200 行 × 50 列 的区域，避免 SXSSF 崩溃
         int targetRow = lastDataRow + 200;  // 向下扩展 200 行
