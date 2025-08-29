@@ -3,6 +3,7 @@ package com.demo.controller;
 import com.demo.domain.Department;
 import com.demo.domain.Student;
 import com.demo.domain.User;
+import com.demo.domain.Vulnerability;
 import com.demo.utils.DictProvider;
 import com.demo.utils.DictResult;
 import com.demo.utils.MultiSheetExcelWriter;
@@ -38,7 +39,7 @@ public class ExcelController {
         );
     }
 
-    @GetMapping("/demo/users/export")
+    @GetMapping("/demo/basic")
     public void exportUsers(HttpServletResponse response) {
 
         DictProvider dict = (dictType, value) -> {
@@ -61,7 +62,7 @@ public class ExcelController {
 
     }
 
-    @GetMapping("/demo/users/export/mergeRow")
+    @GetMapping("/demo/mergeRow")
     public void exportMergeRow(HttpServletResponse response) {
         // mock 数据
         List<Student> students = Arrays.asList(
@@ -80,8 +81,25 @@ public class ExcelController {
                 "学生导出", "学生列表", dict);
     }
 
+    @GetMapping("/demo/multipleLink")
+    public void exportMultipleLink(HttpServletResponse response) {
+        // mock 数据
+        List<Vulnerability> vulns = Arrays.asList(
+                new Vulnerability(1L, "High", "http://fix1.com;http://fix2.com"),
+                new Vulnerability(2L, "Medium", "http://fix3.com"),
+                new Vulnerability(4L, "High", "http://patch1.com http://patch2.com"),
+                new Vulnerability(5L, "Critical", "http://dbfix.com")
+        );
 
-    @GetMapping("/excel/download")
+        // 空字典实现（这里不做翻译）
+        DictProvider dict = (dictType, value) -> null;
+
+        // 导出
+        SimpleExcelWriter.export(vulns, Vulnerability.class, response,
+                "multipleLink", "漏洞列表", dict);
+    }
+
+    @GetMapping("/demo/simple")
     public void download(HttpServletResponse response) {
         try (Workbook wb = new XSSFWorkbook()) {
             // 1) 创建 Sheet、表头
