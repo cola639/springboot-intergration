@@ -78,7 +78,7 @@ public class ExcelController {
 
         // 调用导出工具
         SimpleExcelWriter.export(students, Student.class, response,
-                "学生导出", "学生列表", dict);
+                "BasicSheet", "学生列表", dict);
     }
 
     @GetMapping("/demo/multipleLink")

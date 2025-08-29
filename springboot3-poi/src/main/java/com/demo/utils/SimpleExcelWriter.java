@@ -3,6 +3,7 @@ package com.demo.utils;
 import com.demo.annotation.Xls;
 import com.demo.annotation.XlsRichText;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -57,7 +58,7 @@ public class SimpleExcelWriter {
         Sheet sheet = wb.createSheet(sheetName == null ? "Sheet1" : sheetName);
 
         // 1) 解析字段元数据
-        List<Col> cols = parseCols(clazz);
+        List<Col> cols = parseCols(clazz, data);
 
         // 2) 样式
         Styles styles = buildStyles(wb, cols);
@@ -118,6 +119,26 @@ public class SimpleExcelWriter {
             sheet.setColumnWidth(i, (int) ((cols.get(i).width + 0.72) * 256));
         }
 
+        // === 合并 url 列表头 ===
+        Map<String, List<Integer>> urlGroups = new HashMap<>();
+        for (int i = 0; i < cols.size(); i++) {
+            Col col = cols.get(i);
+            if (col.isUrlExpanded) {
+                urlGroups.computeIfAbsent(col.parentName, k -> new ArrayList<>()).add(i);
+            }
+        }
+        for (Map.Entry<String, List<Integer>> e : urlGroups.entrySet()) {
+            List<Integer> indexes = e.getValue();
+            if (indexes.size() > 1) {
+                sheet.addMergedRegion(new CellRangeAddress(
+                        0, 0, indexes.get(0), indexes.get(indexes.size() - 1)
+                ));
+                Row headerRow = sheet.getRow(0);
+                Cell mergedCell = headerRow.getCell(indexes.get(0));
+                mergedCell.setCellValue(e.getKey()); // 父表头名
+            }
+        }
+
         // 4) 数据
         int r = 1;
         for (T rowObj : data) {
@@ -131,7 +152,7 @@ public class SimpleExcelWriter {
                 // 默认样式
                 CellStyle cellStyle = styles.data.get(i);
 
-                // extra: set dynamic color if available
+                // === 动态颜色支持 ===
                 String hexColor = resolveColor(raw, col, dictProvider);
                 if (hexColor != null) {
                     if (hexColor.startsWith("#")) {
@@ -152,11 +173,45 @@ public class SimpleExcelWriter {
                     }
                 }
 
-                // 应用最终样式 + 值
+                // === 应用最终样式 ===
                 cell.setCellStyle(cellStyle);
-                cell.setCellValue(str);
-            }
 
+                // === URL 特殊逻辑 ===
+                if (col.isUrlExpanded) {
+                    if (str != null && !str.trim().isEmpty()) {
+                        String[] urls = str.split("[,;\\s]+");
+                        if (col.urlIndex < urls.length) {
+                            String u = urls[col.urlIndex].trim();
+                            if (!u.isEmpty()) {
+                                // 设置超链接
+                                Hyperlink link = wb.getCreationHelper().createHyperlink(HyperlinkType.URL);
+                                link.setAddress(u);
+                                cell.setHyperlink(link);
+
+                                // 创建字体（蓝色+下划线）
+                                Font linkFont = wb.createFont();
+                                linkFont.setUnderline(Font.U_SINGLE);
+                                linkFont.setColor(IndexedColors.BLUE.getIndex());
+
+                                // 创建新的 style
+                                CellStyle urlStyle = wb.createCellStyle();
+                                urlStyle.cloneStyleFrom(cellStyle);
+                                urlStyle.setAlignment(HorizontalAlignment.CENTER);
+                                urlStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                                urlStyle.setFont(linkFont);   // ✅ 直接绑定字体
+
+                                cell.setCellStyle(urlStyle);
+
+                                // 设置单元格值
+                                cell.setCellValue("URL" + (col.urlIndex + 1));
+                            }
+                        }
+                    }
+                } else {
+                    // 普通列
+                    cell.setCellValue(str);
+                }
+            }
         }
 
         int lastRow = sheet.getLastRowNum();
@@ -231,9 +286,9 @@ public class SimpleExcelWriter {
         Field field;
         String name;
         int width;
-        String dateFormat;
-        String converterExp;
-        String dictType;
+        String dateFormat = "";   // ✅ 默认空字符串
+        String converterExp = ""; // ✅ 默认空字符串
+        String dictType = "";     // ✅ 默认空字符串
         HorizontalAlignment align;
         IndexedColors headerBg;
         IndexedColors headerFont;
@@ -249,27 +304,48 @@ public class SimpleExcelWriter {
         // new
         boolean merge;
         String type;
+
+        // for url type
+        boolean isUrl;
+        boolean isUrlExpanded;
+        String parentName;
+        int urlIndex;
     }
 
-    private static <T> List<Col> parseCols(Class<T> clazz) {
+    private static <T> List<Col> parseCols(Class<T> clazz, List<T> data) {
         List<Field> all = new ArrayList<>();
         if (clazz.getSuperclass() != null) {
             all.addAll(Arrays.asList(clazz.getSuperclass().getDeclaredFields()));
         }
         all.addAll(Arrays.asList(clazz.getDeclaredFields()));
 
-        return all.stream()
-                .filter(f -> f.isAnnotationPresent(Xls.class))
-                .sorted(Comparator.comparingInt(f -> f.getAnnotation(Xls.class).order()))
-                .map(f -> {
-                    Xls x = f.getAnnotation(Xls.class);
+        List<Col> cols = new ArrayList<>();
+
+        for (Field f : all) {
+            if (!f.isAnnotationPresent(Xls.class)) continue;
+            Xls x = f.getAnnotation(Xls.class);
+
+            if ("url".equalsIgnoreCase(x.type())) {
+                // 找到最大 url 数量
+                int maxUrlCount = data.stream()
+                        .mapToInt(obj -> {
+                            Object val = fieldValue(obj, f);
+                            if (val == null) return 0;
+                            return String.valueOf(val).split("[,;\\s]+").length;
+                        })
+                        .max().orElse(1);
+
+                for (int i = 0; i < maxUrlCount; i++) {
                     Col c = new Col();
                     c.field = f;
-                    c.name = x.name();
+                    c.name = "URL" + (i + 1); // 子列头名称
+                    c.parentName = x.name();  // 父表头
+                    c.isUrl = true;
+                    c.isUrlExpanded = true;
+                    c.urlIndex = i;
+
+                    // 样式继承注解
                     c.width = x.width();
-                    c.dateFormat = x.dateFormat();
-                    c.converterExp = x.converterExp();
-                    c.dictType = x.dict();
                     c.align = x.align();
                     c.headerBg = x.headerBg();
                     c.headerFont = x.headerFont();
@@ -282,9 +358,34 @@ public class SimpleExcelWriter {
                     c.headerRichTexts = x.headerRichText();
                     c.merge = x.merge();
                     c.type = x.type();
-                    return c;
-                })
-                .collect(Collectors.toList());
+
+                    cols.add(c);
+                }
+            } else {
+                Col c = new Col();
+                c.field = f;
+                c.name = x.name();
+                c.width = x.width();
+                c.dateFormat = x.dateFormat();
+                c.converterExp = x.converterExp();
+                c.dictType = x.dict();
+                c.align = x.align();
+                c.headerBg = x.headerBg();
+                c.headerFont = x.headerFont();
+                c.fontSize = x.fontSize();
+                c.bold = x.bold();
+                c.fontFamily = x.fontFamily();
+                c.headerFontSize = x.headerFontSize();
+                c.headerBold = x.headerBold();
+                c.headerFontFamily = x.headerFontFamily();
+                c.headerRichTexts = x.headerRichText();
+                c.merge = x.merge();
+                c.type = x.type();
+                cols.add(c);
+            }
+        }
+
+        return cols;
     }
 
     private static Object fieldValue(Object obj, Field f) {
