@@ -65,6 +65,18 @@ public class SimpleExcelWriter {
 
         // 3) 表头
         Row header = sheet.createRow(0);
+
+        // === 设置表头高度（取最大值）===
+        int maxHeaderHeight = cols.stream()
+                .mapToInt(c -> c.height)
+                .filter(h -> h > 0)
+                .max()
+                .orElse(-1);
+
+        if (maxHeaderHeight > 0) {
+            header.setHeightInPoints(maxHeaderHeight);
+        }
+
         for (int i = 0; i < cols.size(); i++) {
             Cell cell = header.createCell(i);
             Col col = cols.get(i);
@@ -286,6 +298,7 @@ public class SimpleExcelWriter {
         Field field;
         String name;
         int width;
+        int height;  // 表头行高，默认 -1 表示不设置
         String dateFormat = "";   // ✅ 默认空字符串
         String converterExp = ""; // ✅ 默认空字符串
         String dictType = "";     // ✅ 默认空字符串
@@ -346,6 +359,7 @@ public class SimpleExcelWriter {
 
                     // 样式继承注解
                     c.width = x.width();
+                    c.height = x.height();
                     c.align = x.align();
                     c.headerBg = x.headerBg();
                     c.headerFont = x.headerFont();
@@ -366,6 +380,7 @@ public class SimpleExcelWriter {
                 c.field = f;
                 c.name = x.name();
                 c.width = x.width();
+                c.height = x.height();
                 c.dateFormat = x.dateFormat();
                 c.converterExp = x.converterExp();
                 c.dictType = x.dict();

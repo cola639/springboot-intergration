@@ -16,7 +16,7 @@ public class User {
     })
     private Long userId;
 
-    @Xls(name = "用户名", order = 2, width = 18)
+    @Xls(name = "用户名", height = 100, order = 2, width = 18)
     private String userName;
 
     @Xls(name = "性别", order = 3, converterExp = "0=女,1=男,2=未知", width = 8)
@@ -30,8 +30,6 @@ public class User {
 
     @Xls(name = "创建时间", order = 5, dateFormat = "yyyy-MM-dd HH:mm:ss", width = 22)
     private Date createTime;
-
-
 
     public User(Long userId, String userName, String sex, String status, Date createTime) {
         this.userId = userId;

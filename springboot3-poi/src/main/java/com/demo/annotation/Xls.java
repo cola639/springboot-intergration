@@ -10,6 +10,7 @@ public @interface Xls {
     String name() default "";
     int order() default Integer.MAX_VALUE;
     int width() default 16;
+    int height() default -1;
     String dateFormat() default "";
     String converterExp() default "";
     String dict() default "";
