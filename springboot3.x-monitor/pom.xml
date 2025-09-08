@@ -8,11 +8,11 @@
 		<version>3.5.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.email</groupId>
-	<artifactId>email</artifactId>
+	<groupId>com.monitor</groupId>
+	<artifactId>monitor</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>email</name>
-	<description>email project for Spring Boot</description>
+	<name>monitor</name>
+	<description>monitor project for Spring Boot</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -57,10 +57,10 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
-		</dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
 	</dependencies>
 
