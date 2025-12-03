@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AppController {
 
-    @GetMapping("/demo/users/export")
-    public void exportUsers(HttpServletResponse response) {
+        @GetMapping("/demo/users/export")
+    public String exportUsers(HttpServletResponse response) {
+        return "ok";
     }
 
 }
